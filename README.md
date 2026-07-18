@@ -52,8 +52,8 @@ Since the application is built entirely as a standalone frontend prototype, ther
    ```bash
    git clone https://github.com/ReachingRajnish/Typing-Academy.git
    ```
-2. Open `kids_typing_academy.html` directly in your web browser, or use a local development server (such as Live Server in VS Code, or python's built-in server):
+2. Open `index.html` directly in your web browser, or use a local development server (such as Live Server in VS Code, or python's built-in server):
    ```bash
    python -m http.server 8000
    ```
-3. Navigate to `http://localhost:8000/kids_typing_academy.html` in your browser.
+3. Navigate to `http://localhost:8000/index.html` in your browser.
