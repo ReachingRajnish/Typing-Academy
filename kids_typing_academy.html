@@ -81,45 +81,86 @@
         .key-cap.target-key {
             background-color: var(--target-color, #3B82F6);
             color: #FFFFFF;
-            box-shadow: 0 4px 0 var(--target-shadow, #2563EB), 0 0 15px var(--target-glow, rgba(59, 130, 246, 0.4));
+            box-shadow: 0 4px 0 var(--target-shadow, #2563EB), 0 0 18px var(--target-glow, rgba(59, 130, 246, 0.5));
             border-color: var(--target-color, #3B82F6);
             transform: translateY(-2px);
+            animation: target-pulse 1.2s infinite ease-in-out;
+            z-index: 30;
         }
 
-        /* SVG Hand Overlays */
-        #hands-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 20;
+        @keyframes target-pulse {
+            0%, 100% { transform: translateY(-2px) scale(1); box-shadow: 0 4px 0 var(--target-shadow, #2563EB), 0 0 18px var(--target-glow, rgba(59, 130, 246, 0.5)); }
+            50% { transform: translateY(-5px) scale(1.04); box-shadow: 0 6px 0 var(--target-shadow, #2563EB), 0 0 25px var(--target-glow, rgba(59, 130, 246, 0.7)); }
         }
 
-        /* Realistic Line Art Hand */
-        .hand-line-art {
-            fill: none;
-            stroke: #94A3B8; /* Slate 400 */
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            opacity: 0.6; /* Transparent so keys are visible */
-            transition: opacity 0.3s;
+        /* Custom Scrollbar for Dropdown List */
+        #customDropdownList::-webkit-scrollbar {
+            width: 6px;
+        }
+        #customDropdownList::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 9999px;
+        }
+        #customDropdownList::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        #customDropdownList::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
         }
 
-        /* Active Reaching Finger */
-        .active-finger-overlay {
-            fill: var(--active-color, #3B82F6);
-            stroke: var(--active-stroke, #2563EB);
-            stroke-width: 2;
-            opacity: 0.85;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        /* Dropdown Item Styling */
+        .dropdown-item {
+            padding: 10px 20px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.875rem; /* text-sm */
+            color: #475569; /* Slate 600 */
+            cursor: pointer;
+            transition: background-color 0.15s, color 0.15s;
+            text-align: left;
+            white-space: nowrap; /* Prevent wrapping completely */
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        .dropdown-item:hover {
+            background-color: #F1F5F9; /* Slate 100 */
+            color: #0F172A; /* Slate 900 */
+        }
+        .dropdown-item.selected {
+            background-color: #E2E8F0; /* Slate 200 */
+            color: #0F172A; /* Slate 900 */
+        }
+
+        /* Mastery Feedback Banner styling */
+        .feedback-banner {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.95);
+            opacity: 0;
+            display: none;
+        }
+        .feedback-banner.show {
+            display: flex;
+            transform: scale(1);
+            opacity: 1;
+        }
+
+
 
         /* Typing Text Display */
-        .typed-correct { color: #CBD5E1; }
+        .typed-correct { color: #10B981 !important; } /* Soft mint green */
+        .typed-wrong { color: #F59E0B !important; } /* Warm amber gold */
+        .typed-wrong-active { color: #F59E0B !important; }
         .current-letter { color: #3B82F6; border-bottom: 4px solid #3B82F6; padding-bottom: 2px; }
         .future-letter { color: #94A3B8; }
-        .typed-wrong { color: #EF4444; animation: shake 0.3s ease-in-out; }
+        .space-char {
+            display: inline-block;
+            width: 1.25rem;
+            text-align: center;
+        }
+        .space-char.typed-wrong {
+            border-bottom: 4px solid #F59E0B;
+        }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -141,6 +182,24 @@
         /* Responsive Keyboard Rows */
         .kb-row-2 { margin-left: 4%; }
         .kb-row-3 { margin-left: 9%; padding-right: 4%; }
+
+        /* Hand Placement Intro Animations */
+        .intro-hand-left {
+            transform-origin: bottom left;
+            animation: slide-in-left-hand 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        .intro-hand-right {
+            transform-origin: bottom right;
+            animation: slide-in-right-hand 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        @keyframes slide-in-left-hand {
+            0% { transform: translate(-100px, 150px) rotate(-15deg); opacity: 0; }
+            100% { transform: translate(0, 0) rotate(0); opacity: 1; }
+        }
+        @keyframes slide-in-right-hand {
+            0% { transform: translate(100px, 150px) rotate(15deg); opacity: 0; }
+            100% { transform: translate(0, 0) rotate(0); opacity: 1; }
+        }
         
     </style>
 </head>
@@ -149,14 +208,18 @@
     <div class="max-w-5xl w-full bg-white rounded-[32px] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-6 md:p-10 relative overflow-hidden flex flex-col items-center border border-slate-100 ring-4 ring-slate-50">
         
         <!-- HEADER -->
-        <div id="appHeader" class="w-full flex justify-between items-center mb-6 hidden">
-            <button onclick="showMenu()" class="bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl font-bold hover:bg-slate-200 btn-3d shadow-[0_4px_0_#CBD5E1] text-sm">⬅ Menu</button>
+        <div id="appHeader" class="w-full flex justify-between items-center mb-6 hidden relative min-h-[56px]">
+            <button onclick="showMenu()" class="bg-slate-100 text-slate-600 px-5 py-2.5 rounded-xl font-bold hover:bg-slate-200 btn-3d shadow-[0_4px_0_#CBD5E1] text-sm z-10">⬅ Menu</button>
             
             <!-- School Controls -->
-            <div id="schoolControls" class="hidden flex-1 max-w-xs mx-4">
-                <select id="lessonSelect" onchange="loadSelectedLesson()" class="w-full text-lg font-bold bg-indigo-50 text-indigo-600 p-3 rounded-xl border-2 border-indigo-100 outline-none cursor-pointer text-center appearance-none shadow-sm">
+            <div id="schoolControls" class="hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-50 w-[340px] mx-0">
+                <button id="customDropdownBtn" onclick="toggleDropdown(event)" class="w-full text-center text-sm font-extrabold bg-slate-100 text-slate-600 py-2.5 px-5 rounded-xl border-2 border-slate-200 outline-none cursor-pointer btn-3d shadow-[0_4px_0_#CBD5E1] transition-all hover:bg-slate-200 relative">
+                    <span id="selectedLessonLabel">L1: Home Row - F & J</span>
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 select-none">▼</span>
+                </button>
+                <div id="customDropdownList" class="hidden absolute top-full left-0 right-0 mt-3 bg-white border-2 border-slate-200 rounded-2xl shadow-xl max-h-64 overflow-y-auto z-50 py-1">
                     <!-- Populated by JS -->
-                </select>
+                </div>
             </div>
             
             <h2 id="gameTitle" class="text-3xl text-blue-500 fredoka hidden">Typing Safari</h2>
@@ -164,7 +227,11 @@
             <!-- Stats Board -->
             <div class="bg-slate-50 px-5 py-2.5 rounded-xl border-2 border-slate-100 flex gap-4 shadow-sm">
                 <div id="scoreDisplay" class="text-blue-500 font-bold text-lg hidden flex items-center gap-2">⭐ <span id="gameScore">0</span></div>
-                <div id="mistakeDisplay" class="text-red-400 font-bold text-lg hidden flex items-center gap-2">❌ <span id="lessonMistakes">0</span></div>
+                <div id="mistakeDisplay" class="text-red-400 font-bold text-lg hidden flex items-center gap-5">
+                    <div class="flex items-center gap-1.5" title="Mistakes">❌ <span id="lessonMistakes">0</span></div>
+                    <div class="flex items-center gap-1.5 text-amber-500 font-extrabold" title="Speed">⚡ <span id="lessonWPM">0</span> <span class="text-xs font-bold text-amber-400">WPM</span></div>
+                    <div class="flex items-center gap-1.5 text-emerald-500 font-extrabold" title="Accuracy">🎯 <span id="lessonAccuracy">100</span><span class="text-xs font-bold text-emerald-400">%</span></div>
+                </div>
             </div>
         </div>
 
@@ -192,6 +259,70 @@
             </div>
         </div>
 
+        <!-- HAND PLACEMENT INTRO SCREEN -->
+        <div id="handIntroScreen" class="w-full hidden flex-col items-center justify-center py-6">
+            <h1 class="text-4xl text-slate-700 fredoka mb-2 text-center">Place Your Hands! 👐</h1>
+            <p class="text-base text-slate-400 font-medium mb-6 text-center max-w-lg">Put your left hand on <span class="text-indigo-600 font-bold">A-S-D-F</span> and right hand on <span class="text-indigo-600 font-bold">J-K-L-;</span></p>
+            
+            <!-- Animation Container -->
+            <div class="relative w-full max-w-xl aspect-[16/10] bg-slate-50 border-2 border-slate-100 rounded-3xl p-6 flex flex-col justify-between items-center overflow-hidden shadow-sm mb-6">
+                <!-- Mini Keyboard Row Representation -->
+                <div class="flex justify-center gap-1.5 w-full mt-4">
+                    <!-- Left Home Row Keys -->
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-pink-100 border-pink-200 text-pink-700 ring-2 ring-pink-300 flex items-center justify-center">A</div>
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-blue-100 border-blue-200 text-blue-700 ring-2 ring-blue-300 flex items-center justify-center">S</div>
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-emerald-100 border-emerald-200 text-emerald-700 ring-2 ring-emerald-300 flex items-center justify-center">D</div>
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-amber-100 border-amber-200 text-amber-700 ring-2 ring-amber-300 flex items-center justify-center">F</div>
+                    
+                    <!-- Center G Gap -->
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-slate-50 text-slate-400 border-slate-100 opacity-40 flex items-center justify-center">G</div>
+                    <!-- Center H Gap -->
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-slate-50 text-slate-400 border-slate-100 opacity-40 flex items-center justify-center">H</div>
+                    
+                    <!-- Right Home Row Keys -->
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-purple-100 border-purple-200 text-purple-700 ring-2 ring-purple-300 flex items-center justify-center">J</div>
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-emerald-100 border-emerald-200 text-emerald-700 ring-2 ring-emerald-300 flex items-center justify-center">K</div>
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-blue-100 border-blue-200 text-blue-700 ring-2 ring-blue-300 flex items-center justify-center">L</div>
+                    <div class="key-cap w-[10%] aspect-square text-xs font-extrabold bg-pink-100 border-pink-200 text-pink-700 ring-2 ring-pink-300 flex items-center justify-center">;</div>
+                </div>
+
+                <!-- Animated SVG Hands Container -->
+                <svg id="handPlacementSvg" class="w-full h-48 absolute bottom-0 left-0 right-0 pointer-events-none overflow-visible animate-pulse" viewBox="0 0 576 192">
+                    <!-- Left hand outline -->
+                    <g id="introLeftHand" class="intro-hand-left">
+                        <!-- Draw left hand (palm + fingers) -->
+                        <path d="M 60,200 C 60,140 85,110 85,90 C 85,80 80,45 85,45 C 90,45 92,75 92,90 C 97,75 100,35 105,35 C 110,35 110,70 110,85 C 115,70 118,30 123,30 C 128,30 128,65 128,85 C 133,70 137,40 142,40 C 147,40 145,80 142,105 C 152,100 170,110 170,125 C 170,135 160,150 140,165 C 120,180 90,200 60,200" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="2.5" />
+                        <!-- Indicator circles on fingertips -->
+                        <circle cx="85" cy="45" r="4.5" fill="#EC4899" />
+                        <circle cx="105" cy="35" r="4.5" fill="#3B82F6" />
+                        <circle cx="123" cy="30" r="4.5" fill="#10B981" />
+                        <circle cx="142" cy="40" r="4.5" fill="#F59E0B" />
+                    </g>
+                    <!-- Right hand outline -->
+                    <g id="introRightHand" class="intro-hand-right">
+                        <!-- Draw right hand (palm + fingers) -->
+                        <path d="M 516,200 C 516,140 491,110 491,90 C 491,80 496,45 491,45 C 486,45 484,75 484,90 C 479,75 476,35 471,35 C 466,35 466,70 466,85 C 461,70 458,30 453,30 C 448,30 448,65 448,85 C 443,70 439,40 434,40 C 429,40 431,80 434,105 C 424,100 406,110 406,125 C 406,135 416,150 436,165 C 456,180 486,200 516,200" fill="#E2E8F0" stroke="#CBD5E1" stroke-width="2.5" />
+                        <!-- Indicator circles on fingertips -->
+                        <circle cx="491" cy="45" r="4.5" fill="#EC4899" />
+                        <circle cx="471" cy="35" r="4.5" fill="#3B82F6" />
+                        <circle cx="453" cy="30" r="4.5" fill="#10B981" />
+                        <circle cx="434" cy="40" r="4.5" fill="#8B5CF6" />
+                    </g>
+                </svg>
+            </div>
+            
+            <!-- Controls -->
+            <div class="flex flex-col items-center gap-4 w-full max-w-xs">
+                <button onclick="skipIntroAndStart()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xl font-bold py-3.5 px-6 rounded-2xl btn-3d shadow-[0_4px_0_#4338CA]">
+                    Start Typing! 🚀
+                </button>
+                <label class="flex items-center gap-2 text-slate-400 font-bold text-sm cursor-pointer select-none">
+                    <input type="checkbox" id="skipIntroCheckbox" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-400 border-slate-300">
+                    Skip this guide next time
+                </label>
+            </div>
+        </div>
+
         <!-- TYPING DISPLAY AREA -->
         <div id="playArea" class="w-full hidden flex-col items-center mb-6">
             <div class="bg-slate-50 rounded-[24px] p-8 w-full text-center border-2 border-slate-100 min-h-[200px] flex flex-col justify-center items-center relative">
@@ -199,6 +330,13 @@
                 
                 <div id="wordDisplay" class="fredoka text-5xl md:text-6xl tracking-widest flex flex-wrap justify-center gap-y-4 leading-relaxed px-4 transition-colors">
                     <!-- Letters injected by JS -->
+                </div>
+                
+                <!-- Lesson Mastery Feedback Banner -->
+                <div id="lessonFeedback" class="feedback-banner mt-6 px-6 py-4 rounded-2xl flex-col items-center justify-center text-center max-w-xl">
+                    <div id="feedbackEmoji" class="text-4xl mb-2">🌟</div>
+                    <div id="feedbackTitle" class="text-xl font-extrabold text-slate-700 mb-1">Lesson Complete!</div>
+                    <div id="feedbackDetail" class="text-sm font-semibold text-slate-500">Practice makes perfect!</div>
                 </div>
             </div>
         </div>
@@ -257,15 +395,7 @@
                 </div>
             </div>
 
-            <!-- SVG Container for Realistic Hand Line-Art and Overlays -->
-            <svg id="hands-overlay" xmlns="http://www.w3.org/2000/svg">
-                <!-- Base transparent resting hands (Line Art) -->
-                <path id="left-hand-line" class="hand-line-art" />
-                <path id="right-hand-line" class="hand-line-art" />
-                
-                <!-- The dynamic single active finger -->
-                <path id="active-finger-overlay" class="active-finger-overlay" />
-            </svg>
+
         </div>
     </div>
 
@@ -290,16 +420,33 @@
 
         // Structured Progressive Lessons
         const lessons = [
-            { id: 0, title: "L1: Home Row F & J", text: "f j f j f f j j f j f j f j" },
-            { id: 1, title: "L2: Adding D & K", text: "d k d k d d k k f j d k f j" },
-            { id: 2, title: "L3: Adding S & L", text: "s l s l s s l l d k f j s l" },
-            { id: 3, title: "L4: Full Home Row", text: "a ; a ; s l d k f j a s d f j k l ;" },
-            { id: 4, title: "L5: Reaching Up R & U", text: "r u r u f r j u f r j u r u" },
-            { id: 5, title: "L6: Top Row Vowels", text: "e i e i w o w o q p q p e i" },
-            { id: 6, title: "L7: Bottom Row V & M", text: "v m v m f v j m f v j m v m" },
-            { id: 7, title: "L8: Full Bottom Row", text: "c , x . z c , x . z c , x ." },
-            { id: 8, title: "L9: Short Words", text: "cat dog red fun run sun mad sad glad" },
-            { id: 9, title: "L10: Sentences", text: "a quick brown fox jumps over the lazy dog" }
+            // Home Row
+            { id: 0, title: "L1: Home Row - F & J", text: "ff jj ff jj f j f j ff jj fj jf" },
+            { id: 1, title: "L2: Home Row - Adding D & K", text: "dd kk dk kd fd jk df jk fd jk dk kd" },
+            { id: 2, title: "L3: Home Row - Adding S & L", text: "ss ll sl ls ds kl sd kl sf jl sk dk" },
+            { id: 3, title: "L4: Home Row - Adding A & ;", text: "aa ;; a; ;a as df jk l; asdf jkl;" },
+            { id: 4, title: "L5: Home Row - Reaches G & H", text: "fg jh fg jh gg hh gh hg asdfg hjkl;" },
+            { id: 5, title: "L6: Full Home Row Words", text: "asdf jkl; glad half fall slag flask dad salad" },
+            
+            // Top Row
+            { id: 6, title: "L7: Top Row - R & U", text: "fr ju fr ju rr uu ru ur fur jug ruf jur" },
+            { id: 7, title: "L8: Top Row - Adding E & I", text: "de ki de ki ee ii ei ie red kid led lid die" },
+            { id: 8, title: "L9: Top Row - Adding W & O", text: "sw lo sw lo ww oo wo ow row low sew owl sow" },
+            { id: 9, title: "L10: Top Row - Adding Q & P", text: "aq ;p aq ;p qq pp qp pq quiet power pull quit" },
+            { id: 10, title: "L11: Top Row - Reaches T & Y", text: "ft jy ft jy tt yy ty yt toy try out yet wet dry" },
+            { id: 11, title: "L12: Full Top & Home Row Words", text: "write read step work play tree water yellow quiet float" },
+            
+            // Bottom Row
+            { id: 12, title: "L13: Bottom Row - V & M", text: "fv jm fv jm vv mm vm mv van mud valuable summer" },
+            { id: 13, title: "L14: Bottom Row - Adding C & ,", text: "dc k, dc k, cc ,, c, ,c cat dog ice nice dance" },
+            { id: 14, title: "L15: Bottom Row - Adding X & .", text: "sx l. sx l. xx .. x. .x fox box tax fix six six. fox." },
+            { id: 15, title: "L16: Bottom Row - Adding Z & B & N", text: "az fgb jhn zz bb nn zebra blue new bench zone brown" },
+            { id: 16, title: "L17: Full Bottom & Home Row Words", text: "cab man back cold zero zone zebra nice much voice" },
+            
+            // Combined and Advanced
+            { id: 17, title: "L18: High Frequency Words", text: "the and that with have this will your from they would" },
+            { id: 18, title: "L19: Short Phrases", text: "go home, play ball, look up, run fast, make it, be kind" },
+            { id: 19, title: "L20: Full Sentences", text: "the quick brown fox jumps over the lazy dog." }
         ];
 
         // Touch Typing Logic Mappings
@@ -368,138 +515,41 @@
             }
         }
 
-        // Human Hand SVG Generation Engine
-        function getCenterOfKey(keyChar, offset = 0) {
-            const keyEl = Array.from(keys).find(k => k.getAttribute('data-key') === keyChar);
-            if (!keyEl) return { x: 0, y: 0 };
-            const kbRect = document.getElementById('virtualKeyboard').getBoundingClientRect();
-            const keyRect = keyEl.getBoundingClientRect();
-            return {
-                x: keyRect.left - kbRect.left + (keyRect.width / 2) + offset,
-                y: keyRect.top - kbRect.top + (keyRect.height / 2)
-            };
-        }
-
-        function drawFingerCurve(webL, tip, webR, width) {
-            const tipL = { x: tip.x - width/2, y: tip.y };
-            const tipR = { x: tip.x + width/2, y: tip.y };
-            const c1 = { x: webL.x, y: tip.y + (webL.y - tip.y) * 0.3 };
-            const c2 = { x: tipL.x, y: tip.y + (webL.y - tip.y) * 0.1 };
-            const c3 = { x: tipR.x, y: tip.y + (webR.y - tip.y) * 0.1 };
-            const c4 = { x: webR.x, y: tip.y + (webR.y - tip.y) * 0.3 };
-            return `C ${c1.x},${c1.y} ${c2.x},${c2.y} ${tipL.x},${tipL.y} A ${width/2},${width/2} 0 0,1 ${tipR.x},${tipR.y} C ${c3.x},${c3.y} ${c4.x},${c4.y} ${webR.x},${webR.y} `;
-        }
-
-        function generateActiveFingerOverlay(webL, tip, webR, width) {
-            const tipL = { x: tip.x - width/2, y: tip.y };
-            const tipR = { x: tip.x + width/2, y: tip.y };
-            // Straighter curve for reaching
-            const c1 = { x: webL.x, y: webL.y - 15 };
-            const c2 = { x: tipL.x, y: tip.y + 15 };
-            const c3 = { x: tipR.x, y: tip.y + 15 };
-            const c4 = { x: webR.x, y: webR.y - 15 };
-            return `M ${webL.x},${webL.y} C ${c1.x},${c1.y} ${c2.x},${c2.y} ${tipL.x},${tipL.y} A ${width/2},${width/2} 0 0,1 ${tipR.x},${tipR.y} C ${c3.x},${c3.y} ${c4.x},${c4.y} ${webR.x},${webR.y} Z`;
-        }
-
-        function renderHumanHands(activeLetter) {
-            if(document.getElementById('keyboardArea').classList.contains('hidden')) return;
-
-            const home = {
-                pl: getCenterOfKey('a'), rl: getCenterOfKey('s'), ml: getCenterOfKey('d'), il: getCenterOfKey('f'), tl: getCenterOfKey(' ', -40),
-                pr: getCenterOfKey(';'), rr: getCenterOfKey('l'), mr: getCenterOfKey('k'), ir: getCenterOfKey('j'), tr: getCenterOfKey(' ', 40)
-            };
+        function highlightTargetKey(activeLetter) {
+            // Clear previous target key highlights
+            keys.forEach(k => {
+                k.classList.remove('target-key');
+                k.style.removeProperty('--target-color');
+                k.style.removeProperty('--target-shadow');
+                k.style.removeProperty('--target-glow');
+            });
             
-            // Abort if layout isn't calculated yet
-            if(home.pl.x === 0) return;
-
-            const yKnuck = home.il.y + 40;
-            const yWrist = yKnuck + 150;
-            const F_W = { p: 16, r: 18, m: 19, i: 19, t: 24 }; // Finger Widths
-
-            // Left Hand Webbing
-            const wL = {
-                out: { x: home.pl.x - 20, y: yKnuck + 15 },
-                pr: { x: (home.pl.x + home.rl.x)/2, y: yKnuck },
-                rm: { x: (home.rl.x + home.ml.x)/2, y: yKnuck - 5 },
-                mi: { x: (home.ml.x + home.il.x)/2, y: yKnuck },
-                it: { x: home.il.x + 18, y: yKnuck + 20 },
-                tin: { x: home.tl.x + 15, y: yKnuck + 60 }
-            };
-
-            // Draw Resting Left Line Art
-            let leftPath = `M ${wL.out.x - 20},${yWrist} C ${wL.out.x - 10},${yKnuck + 40} ${wL.out.x},${yKnuck + 20} ${wL.out.x},${yKnuck} ` +
-                drawFingerCurve(wL.out, home.pl, wL.pr, F_W.p) + drawFingerCurve(wL.pr, home.rl, wL.rm, F_W.r) +
-                drawFingerCurve(wL.rm, home.ml, wL.mi, F_W.m) + drawFingerCurve(wL.mi, home.il, wL.it, F_W.i) +
-                drawFingerCurve(wL.it, home.tl, wL.tin, F_W.t) + `C ${wL.tin.x + 15},${yWrist - 40} ${home.ml.x + 20},${yWrist - 20} ${home.ml.x + 20},${yWrist} Z`;
-            document.getElementById('left-hand-line').setAttribute('d', leftPath);
-
-            // Right Hand Webbing
-            const wR = {
-                out: { x: home.pr.x + 20, y: yKnuck + 15 },
-                pr: { x: (home.pr.x + home.rr.x)/2, y: yKnuck },
-                rm: { x: (home.rr.x + home.mr.x)/2, y: yKnuck - 5 },
-                mi: { x: (home.mr.x + home.ir.x)/2, y: yKnuck },
-                it: { x: home.ir.x - 18, y: yKnuck + 20 },
-                tin: { x: home.tr.x - 15, y: yKnuck + 60 }
-            };
-
-            // Draw Resting Right Line Art
-            let rightPath = `M ${wR.out.x + 20},${yWrist} C ${wR.out.x + 10},${yKnuck + 40} ${wR.out.x},${yKnuck + 20} ${wR.out.x},${yKnuck} ` +
-                drawFingerCurve(wR.out, home.pr, wR.pr, F_W.p) + drawFingerCurve(wR.pr, home.rr, wR.rm, F_W.r) +
-                drawFingerCurve(wR.rm, home.mr, wR.mi, F_W.m) + drawFingerCurve(wR.mi, home.ir, wR.it, F_W.i) +
-                drawFingerCurve(wR.it, home.tr, wR.tin, F_W.t) + `C ${wR.tin.x - 15},${yWrist - 40} ${home.mr.x - 20},${yWrist - 20} ${home.mr.x - 20},${yWrist} Z`;
-            document.getElementById('right-hand-line').setAttribute('d', rightPath);
-
-            // Active Target Highlights
-            keys.forEach(k => k.classList.remove('target-key'));
-            const overlayEl = document.getElementById('active-finger-overlay');
             const instBanner = document.getElementById('instructionBanner');
-            
-            if (activeLetter && currentMode === 'school') {
-                const fId = FINGER_MAP[activeLetter] || 'thumb-r';
-                const tCoord = getCenterOfKey(activeLetter, activeLetter === ' ' ? (fId === 'thumb-l' ? -40 : 40) : 0);
-                const theme = FINGER_COLORS[fId];
+            if (!activeLetter || currentMode !== 'school') {
+                if (instBanner) instBanner.classList.add('hidden');
+                return;
+            }
 
-                // Highlight Keyboard Key
-                const kEl = Array.from(keys).find(k => k.getAttribute('data-key') === activeLetter);
-                if(kEl) {
-                    kEl.classList.add('target-key');
-                    kEl.style.setProperty('--target-color', theme.hex);
-                    kEl.style.setProperty('--target-shadow', theme.shadow);
-                    kEl.style.setProperty('--target-glow', theme.hex + '66'); // 40% opacity hex
-                }
+            const kEl = Array.from(keys).find(k => k.getAttribute('data-key') === activeLetter);
+            const fId = FINGER_MAP[activeLetter] || 'thumb-r';
+            const theme = FINGER_COLORS[fId];
 
-                // Identify Correct Webbing for the Active Finger
-                let L, R, W;
-                if(fId === 'pinky-l'){ L=wL.out; R=wL.pr; W=F_W.p;} else if(fId === 'ring-l'){ L=wL.pr; R=wL.rm; W=F_W.r;}
-                else if(fId === 'middle-l'){ L=wL.rm; R=wL.mi; W=F_W.m;} else if(fId === 'index-l'){ L=wL.mi; R=wL.it; W=F_W.i;}
-                else if(fId === 'thumb-l'){ L=wL.it; R=wL.tin; W=F_W.t;}
-                else if(fId === 'pinky-r'){ L=wR.out; R=wR.pr; W=F_W.p;} else if(fId === 'ring-r'){ L=wR.pr; R=wR.rm; W=F_W.r;}
-                else if(fId === 'middle-r'){ L=wR.rm; R=wR.mi; W=F_W.m;} else if(fId === 'index-r'){ L=wR.mi; R=wR.it; W=F_W.i;}
-                else if(fId === 'thumb-r'){ L=wR.it; R=wR.tin; W=F_W.t;}
+            if (kEl) {
+                kEl.classList.add('target-key');
+                kEl.style.setProperty('--target-color', theme.hex);
+                kEl.style.setProperty('--target-shadow', theme.shadow);
+                kEl.style.setProperty('--target-glow', theme.hex + '66'); // 40% opacity hex
+            }
 
-                // Draw solid reaching finger over the line art
-                overlayEl.setAttribute('d', generateActiveFingerOverlay(L, tCoord, R, W));
-                overlayEl.style.setProperty('--active-color', theme.hex);
-                overlayEl.style.setProperty('--active-stroke', theme.shadow);
-                overlayEl.style.opacity = 1;
-
-                // Update Instruction Banner
+            // Update Instruction Banner
+            if (instBanner) {
                 instBanner.classList.remove('hidden');
                 document.getElementById('instKey').textContent = activeLetter === ' ' ? 'SPACE' : activeLetter;
                 document.getElementById('instKey').style.backgroundColor = theme.hex;
                 document.getElementById('instFinger').textContent = FINGER_NAMES[fId];
                 document.getElementById('instFinger').style.color = theme.hex;
-
-            } else {
-                overlayEl.style.opacity = 0;
-                instBanner.classList.add('hidden');
             }
         }
-
-        window.addEventListener('resize', () => {
-            if(currentMode === 'school') renderHumanHands(currentWord[currentIndex] || 'x_rest');
-        });
 
         // Core App State
         let currentMode = "menu"; 
@@ -507,6 +557,61 @@
         let currentIndex = 0;
         let gameScore = 0;
         let lessonMistakes = 0;
+        
+        // Typing school stats tracking
+        let lessonStartTime = null;
+        let hasStartedTyping = false;
+        let selectedLessonId = 0;
+        let charStates = [];
+        let feedbackTimeoutId = null;
+
+        // Custom Dropdown Menu Logic
+        function toggleDropdown(event) {
+            if (event) event.stopPropagation();
+            const list = document.getElementById('customDropdownList');
+            const isOpen = !list.classList.contains('hidden');
+            if (isOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        }
+
+        function openDropdown() {
+            const list = document.getElementById('customDropdownList');
+            list.classList.remove('hidden');
+            // Highlight selected item in list
+            lessons.forEach(l => {
+                const item = document.getElementById(`dropdown-item-${l.id}`);
+                if (item) {
+                    if (l.id === selectedLessonId) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                }
+            });
+        }
+
+        function closeDropdown() {
+            const list = document.getElementById('customDropdownList');
+            if (list) list.classList.add('hidden');
+        }
+
+        function selectLesson(lessonId) {
+            selectedLessonId = lessonId;
+            const lesson = lessons.find(l => l.id === lessonId);
+            if (lesson) {
+                document.getElementById('selectedLessonLabel').textContent = lesson.title;
+            }
+            closeDropdown();
+            loadSelectedLesson();
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', () => {
+            closeDropdown();
+        });
 
         function showMenu() {
             currentMode = "menu";
@@ -515,6 +620,40 @@
             document.getElementById('keyboardArea').classList.add('hidden');
             document.getElementById('appHeader').classList.add('hidden');
             document.getElementById('instructionBanner').classList.add('hidden');
+            document.getElementById('handIntroScreen').classList.add('hidden');
+            document.getElementById('handIntroScreen').classList.remove('flex');
+            
+            // Clean up stats
+            const feedback = document.getElementById('lessonFeedback');
+            if (feedback) {
+                feedback.classList.remove('show');
+                feedback.style.display = 'none';
+            }
+            if (feedbackTimeoutId) {
+                clearTimeout(feedbackTimeoutId);
+                feedbackTimeoutId = null;
+            }
+        }
+
+        function skipIntroAndStart() {
+            const skipCheckbox = document.getElementById('skipIntroCheckbox');
+            if (skipCheckbox && skipCheckbox.checked) {
+                localStorage.setItem('skipHandIntro', 'true');
+            } else {
+                localStorage.setItem('skipHandIntro', 'false');
+            }
+            
+            document.getElementById('handIntroScreen').classList.add('hidden');
+            document.getElementById('handIntroScreen').classList.remove('flex');
+            
+            // Show actual school typing layout
+            document.getElementById('playArea').classList.remove('hidden');
+            document.getElementById('playArea').classList.add('flex');
+            document.getElementById('keyboardArea').classList.remove('hidden');
+            document.getElementById('appHeader').classList.remove('hidden');
+            document.getElementById('appHeader').classList.add('flex');
+            
+            selectLesson(selectedLessonId);
         }
 
         async function startMode(mode) {
@@ -522,11 +661,6 @@
             currentMode = mode;
             
             document.getElementById('mainMenu').classList.add('hidden');
-            document.getElementById('playArea').classList.remove('hidden');
-            document.getElementById('playArea').classList.add('flex');
-            document.getElementById('keyboardArea').classList.remove('hidden');
-            document.getElementById('appHeader').classList.remove('hidden');
-            document.getElementById('appHeader').classList.add('flex');
 
             if (mode === 'school') {
                 document.getElementById('schoolControls').classList.remove('hidden');
@@ -536,12 +670,58 @@
                 document.getElementById('gameEmoji').classList.add('hidden');
                 
                 // Populate Dropdown
-                const select = document.getElementById('lessonSelect');
-                if(select.options.length === 0) {
-                    lessons.forEach(l => select.add(new Option(l.title, l.id)));
+                const listContainer = document.getElementById('customDropdownList');
+                if (listContainer.children.length === 0) {
+                    lessons.forEach(l => {
+                        const item = document.createElement('div');
+                        item.className = 'dropdown-item';
+                        item.id = `dropdown-item-${l.id}`;
+                        item.textContent = l.title;
+                        item.onclick = (e) => {
+                            e.stopPropagation();
+                            selectLesson(l.id);
+                        };
+                        listContainer.appendChild(item);
+                    });
                 }
-                loadSelectedLesson();
+                
+                // Check if they want to skip the hand guide
+                if (localStorage.getItem('skipHandIntro') === 'true') {
+                    document.getElementById('playArea').classList.remove('hidden');
+                    document.getElementById('playArea').classList.add('flex');
+                    document.getElementById('keyboardArea').classList.remove('hidden');
+                    document.getElementById('appHeader').classList.remove('hidden');
+                    document.getElementById('appHeader').classList.add('flex');
+                    selectLesson(selectedLessonId);
+                } else {
+                    // Show Hand Placement Intro Screen
+                    document.getElementById('handIntroScreen').classList.remove('hidden');
+                    document.getElementById('handIntroScreen').classList.add('flex');
+                    
+                    // Reset checkbox to unchecked
+                    const skipCheckbox = document.getElementById('skipIntroCheckbox');
+                    if (skipCheckbox) skipCheckbox.checked = false;
+                    
+                    // Re-run animation by resetting animation property
+                    const leftH = document.getElementById('introLeftHand');
+                    const rightH = document.getElementById('introRightHand');
+                    if (leftH && rightH) {
+                        leftH.style.animation = 'none';
+                        rightH.style.animation = 'none';
+                        leftH.offsetHeight; /* trigger reflow */
+                        rightH.offsetHeight; /* trigger reflow */
+                        leftH.style.animation = 'slide-in-left-hand 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards';
+                        rightH.style.animation = 'slide-in-right-hand 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards';
+                    }
+                }
             } else {
+                // Game Mode
+                document.getElementById('playArea').classList.remove('hidden');
+                document.getElementById('playArea').classList.add('flex');
+                document.getElementById('keyboardArea').classList.remove('hidden');
+                document.getElementById('appHeader').classList.remove('hidden');
+                document.getElementById('appHeader').classList.add('flex');
+                
                 document.getElementById('schoolControls').classList.add('hidden');
                 document.getElementById('mistakeDisplay').classList.add('hidden');
                 document.getElementById('gameTitle').classList.remove('hidden');
@@ -549,11 +729,8 @@
                 document.getElementById('gameEmoji').classList.remove('hidden');
                 document.getElementById('instructionBanner').classList.add('hidden');
                 
-                // Hide Hand SVGs in Game Mode
-                document.getElementById('left-hand-line').setAttribute('d', '');
-                document.getElementById('right-hand-line').setAttribute('d', '');
-                document.getElementById('active-finger-overlay').style.opacity = 0;
-                keys.forEach(k => k.classList.remove('target-key'));
+                // Hide targets and popup in Game Mode
+                highlightTargetKey('');
                 
                 gameScore = 0;
                 document.getElementById('gameScore').textContent = gameScore;
@@ -565,6 +742,7 @@
             const word = fullGameDictionary[Math.floor(Math.random() * fullGameDictionary.length)];
             currentWord = word.toLowerCase();
             currentIndex = 0;
+            charStates = new Array(currentWord.length).fill('pending');
 
             const emojiEl = document.getElementById('gameEmoji');
             emojiEl.textContent = emojis[currentWord] || fallbackEmojis[Math.floor(Math.random() * fallbackEmojis.length)];
@@ -574,15 +752,28 @@
         }
 
         function loadSelectedLesson() {
-            const lessonId = parseInt(document.getElementById('lessonSelect').value);
-            const lesson = lessons.find(l => l.id === lessonId);
+            const lesson = lessons.find(l => l.id === selectedLessonId);
             currentWord = lesson.text.toLowerCase();
             currentIndex = 0;
             lessonMistakes = 0;
             document.getElementById('lessonMistakes').textContent = lessonMistakes;
+            charStates = new Array(currentWord.length).fill('pending');
+            
+            // Reset stats displays
+            document.getElementById('lessonWPM').textContent = '0';
+            document.getElementById('lessonAccuracy').textContent = '100';
+            lessonStartTime = null;
+            hasStartedTyping = false;
+
+            // Hide feedback banner if showing
+            const feedback = document.getElementById('lessonFeedback');
+            if (feedback) {
+                feedback.classList.remove('show');
+                feedback.style.display = 'none';
+            }
 
             renderWord();
-            setTimeout(() => renderHumanHands(currentWord[currentIndex]), 50); // Small delay to ensure layout is done
+            setTimeout(() => highlightTargetKey(currentWord[currentIndex]), 50); // Small delay to ensure layout is done
         }
 
         function renderWord() {
@@ -591,14 +782,29 @@
             
             for (let i = 0; i < currentWord.length; i++) {
                 const span = document.createElement('span');
-                span.textContent = currentWord[i] === ' ' ? '␣' : currentWord[i].toUpperCase();
                 
-                if (i < currentIndex) {
-                    span.className = 'typed-correct';
-                } else if (i === currentIndex) {
-                    span.className = 'current-letter';
+                // Remove space sign: just show a blank space styled in CSS
+                if (currentWord[i] === ' ') {
+                    span.textContent = ' ';
+                    span.className = 'space-char';
                 } else {
-                    span.className = 'future-letter';
+                    span.textContent = currentWord[i].toUpperCase();
+                }
+                
+                // Color coding based on status
+                if (i === currentIndex) {
+                    span.className += ' current-letter';
+                    if (charStates[i] === 'wrong') {
+                        span.className += ' typed-wrong-active';
+                    }
+                } else if (i < currentIndex) {
+                    if (charStates[i] === 'wrong') {
+                        span.className += ' typed-wrong';
+                    } else {
+                        span.className += ' typed-correct';
+                    }
+                } else {
+                    span.className += ' future-letter';
                 }
                 display.appendChild(span);
             }
@@ -612,33 +818,161 @@
             }
         }
 
+        function updateRealTimeStats() {
+            if (currentMode !== 'school' || !hasStartedTyping || !lessonStartTime) return;
+            
+            const totalAttempts = currentIndex + lessonMistakes;
+            const accuracy = totalAttempts > 0 ? Math.round((currentIndex / totalAttempts) * 100) : 100;
+            document.getElementById('lessonAccuracy').textContent = accuracy;
+
+            const elapsedSeconds = (Date.now() - lessonStartTime) / 1000;
+            if (elapsedSeconds > 0.5) {
+                const minutes = elapsedSeconds / 60;
+                const wpm = Math.round((currentIndex / 5) / minutes);
+                document.getElementById('lessonWPM').textContent = wpm;
+            }
+        }
+
         function handleInput(letter) {
             if (currentMode === 'menu') return;
+            
+            // Start timer on first keystroke in school mode
+            if (currentMode === 'school' && !hasStartedTyping) {
+                lessonStartTime = Date.now();
+                hasStartedTyping = true;
+            }
             
             const expectedLetter = currentWord[currentIndex];
             visualKeyPress(letter);
 
             if (letter === expectedLetter) {
                 playKeySound(true, currentIndex);
+                
+                // Record correct state only if it was not already marked wrong
+                if (currentMode === 'school' && charStates[currentIndex] !== 'wrong') {
+                    charStates[currentIndex] = 'correct';
+                }
+                
                 currentIndex++;
                 renderWord();
 
                 if (currentIndex === currentWord.length) {
                     // Sequence Success
-                    if(audioReady) successSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "2n", Tone.now());
                     
                     if (currentMode === 'game') {
+                        if(audioReady) successSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "2n", Tone.now());
                         gameScore += currentWord.length * 10;
                         document.getElementById('gameScore').textContent = gameScore;
                         document.getElementById('gameEmoji').classList.add('animal-happy');
                         setTimeout(loadNewGameWord, 1000);
                     } else {
-                        // Lesson complete, load next or reset
-                        setTimeout(() => renderHumanHands(''), 50); // Hide reaching finger
+                        // Lesson complete, check mastery criteria!
+                        // Calculate final stats
+                        const finalWPM = parseInt(document.getElementById('lessonWPM').textContent);
+                        const finalAccuracy = parseInt(document.getElementById('lessonAccuracy').textContent);
+                        
+                        // Mastery thresholds
+                        let targetWPM = 10;
+                        let targetAccuracy = 90;
+                        
+                        if (selectedLessonId >= 6 && selectedLessonId <= 16) {
+                            targetWPM = 15;
+                        } else if (selectedLessonId >= 17) {
+                            targetWPM = 20;
+                        }
+                        
+                        const passed = (finalWPM >= targetWPM && finalAccuracy >= targetAccuracy);
+                        
+                        // Show Feedback Banner
+                        const feedback = document.getElementById('lessonFeedback');
+                        const fbEmoji = document.getElementById('feedbackEmoji');
+                        const fbTitle = document.getElementById('feedbackTitle');
+                        const fbDetail = document.getElementById('feedbackDetail');
+                        
+                        // Clear classes
+                        feedback.className = "feedback-banner mt-6 px-6 py-4 rounded-2xl flex flex-col items-center justify-center text-center max-w-xl";
+                        
+                        // Clear active target key highlight
+                        highlightTargetKey('');
                         document.getElementById('instructionBanner').classList.add('hidden');
+                        
+                        if (passed) {
+                            // Play success melody
+                            if(audioReady) successSynth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "2n", Tone.now());
+                            
+                            feedback.classList.add('bg-emerald-50', 'text-emerald-800', 'border-2', 'border-emerald-100');
+                            fbEmoji.textContent = "🚀";
+                            fbTitle.textContent = "Awesome Job! 🌟";
+                            fbDetail.textContent = `You reached ${finalWPM} WPM with ${finalAccuracy}% accuracy! Moving to next lesson...`;
+                            
+                            feedback.style.display = 'flex';
+                            setTimeout(() => feedback.classList.add('show'), 10);
+                            
+                            // Automatically load the next lesson
+                            const nextLesson = lessons.find(l => l.id === selectedLessonId + 1);
+                            setTimeout(() => {
+                                if (nextLesson) {
+                                    selectLesson(nextLesson.id);
+                                } else {
+                                    // All lessons complete! Return to menu
+                                    showMenu();
+                                }
+                            }, 2500);
+                        } else {
+                            // Play fail sound
+                            if(audioReady) synth.triggerAttackRelease("C3", "4n", Tone.now());
+                            
+                            feedback.classList.add('bg-amber-50', 'text-amber-800', 'border-2', 'border-amber-100');
+                            fbEmoji.textContent = "✨";
+                            fbTitle.textContent = "Let's Practice More! 🌟";
+                            
+                            let reason = "";
+                            if (finalWPM < targetWPM && finalAccuracy < targetAccuracy) {
+                                reason = `to reach speed above ${targetWPM} WPM and accuracy above ${targetAccuracy}%`;
+                            } else if (finalWPM < targetWPM) {
+                                reason = `to get speed above ${targetWPM} WPM (you got ${finalWPM} WPM)`;
+                            } else {
+                                reason = `to get accuracy above ${targetAccuracy}% (you got ${finalAccuracy}%)`;
+                            }
+                            fbDetail.textContent = `Let's repeat this lesson ${reason}! (Click anywhere to skip or click on this message to read longer)`;
+                            
+                            feedback.style.display = 'flex';
+                            setTimeout(() => feedback.classList.add('show'), 10);
+                            
+                            // Define dismiss and clean handler
+                            const dismissFeedbackAndRestart = () => {
+                                window.removeEventListener('pointerdown', onFeedbackClick);
+                                clearTimeout(feedbackTimeoutId);
+                                feedbackTimeoutId = null;
+                                loadSelectedLesson();
+                            };
+                            
+                            const onFeedbackClick = (e) => {
+                                e.stopPropagation();
+                                if (feedback.contains(e.target)) {
+                                    // Clicked directly on the message! Extend the view time (minorly longer: 14 seconds from now)
+                                    clearTimeout(feedbackTimeoutId);
+                                    feedbackTimeoutId = setTimeout(dismissFeedbackAndRestart, 14000);
+                                } else {
+                                    // Clicked anywhere else! Restart immediately
+                                    dismissFeedbackAndRestart();
+                                }
+                            };
+                            
+                            // Register the click/touch listener with a minor delay to prevent consuming current active touch
+                            setTimeout(() => {
+                                window.addEventListener('pointerdown', onFeedbackClick);
+                            }, 100);
+                            
+                            // Set initial auto-dismiss timeout slightly longer (8 seconds)
+                            feedbackTimeoutId = setTimeout(dismissFeedbackAndRestart, 8000);
+                        }
                     }
                 } else {
-                    if (currentMode === 'school') renderHumanHands(currentWord[currentIndex]);
+                    if (currentMode === 'school') {
+                        highlightTargetKey(currentWord[currentIndex]);
+                        updateRealTimeStats();
+                    }
                 }
             } else {
                 // Mistake
@@ -651,8 +985,14 @@
                     document.getElementById('gameEmoji').classList.add('animal-sad');
                     setTimeout(() => document.getElementById('gameEmoji').classList.remove('animal-sad'), 400);
                 } else {
+                    // Mark as wrong in school mode
+                    if (currentMode === 'school') {
+                        charStates[currentIndex] = 'wrong';
+                        renderWord(); // Rerender to show active character as yellow
+                    }
                     lessonMistakes++;
                     document.getElementById('lessonMistakes').textContent = lessonMistakes;
+                    updateRealTimeStats();
                 }
             }
         }
